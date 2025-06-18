@@ -1,16 +1,21 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "pixis/database"
+	"github.com/alexandrosraikos/pixis/database"
+	"github.com/alexandrosraikos/pixis/handlers"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-    db := database.ConnectDatabase()
-    defer db.Close()
+	database.ConnectDatabase("database/main.db")
 
-    r := gin.Default()
-    // Register your routes here
+	r := gin.Default()
 
-    r.Run() // default :8080
+	r.POST("/conscripts", handlers.CreateConscript)
+	r.GET("/conscripts", handlers.GetConscripts)
+	r.GET("/conscripts/:id", handlers.GetConscript)
+	r.PUT("/conscripts/:id", handlers.UpdateConscript)
+	r.DELETE("/conscripts/:id", handlers.DeleteConscript)
+
+	r.Run()
 }

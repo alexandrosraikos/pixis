@@ -8,8 +8,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o pixis
+RUN go build -o app
 
 EXPOSE 8080
 
-CMD ["./pixis"]
+CMD ["./app"]

@@ -2,7 +2,7 @@
 *.db
 
 # Ignore binaries
-/pixis
+/app
 *.exe
 *.dll
 *.so

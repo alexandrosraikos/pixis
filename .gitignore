@@ -1,10 +1,11 @@
 # Binaries
-/pixis
+/app
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+__debug*
 
 # Database
 *.db
@@ -17,6 +18,5 @@
 Thumbs.db
 
 # IDE/editor files
-.vscode/
 .idea/
 *.swp
