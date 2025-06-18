@@ -1,0 +1,22 @@
+# Binaries
+/pixis
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Database
+*.db
+
+# Vendor directory (if you use `go mod vendor`)
+/vendor/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp

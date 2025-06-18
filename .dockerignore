@@ -1,0 +1,23 @@
+# Ignore the database file
+*.db
+
+# Ignore binaries
+/pixis
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Ignore source control and editor files
+.git
+.gitignore
+.vscode/
+.idea/
+*.swp
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore vendor directory (if not needed in image)
+/vendor/
