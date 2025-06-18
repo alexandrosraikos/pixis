@@ -1,8 +1,6 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
 type Conscript struct {
 	ID             uint `gorm:"primaryKey;autoIncrement"`
@@ -11,6 +9,8 @@ type Conscript struct {
 	RegistryNumber string `gorm:"uniqueIndex"`
 	Username       string `gorm:"uniqueIndex"`
 	Password       string
+	DepartmentID   uint
+	Department     Department
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

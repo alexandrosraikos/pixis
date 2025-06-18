@@ -17,8 +17,13 @@ func ConnectDatabase(path string) {
 	}
 
 	// Auto-migrate the Conscript model
-	db.AutoMigrate(&models.Conscript{})
-
+	db.AutoMigrate(
+		&models.ConscriptDuty{},
+		&models.Department{},
+		&models.Conscript{},
+		&models.Service{},
+		&models.Duty{},
+	)
 	DB = db
 }
 
