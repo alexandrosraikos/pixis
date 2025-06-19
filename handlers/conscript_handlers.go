@@ -14,6 +14,7 @@ import (
 // @Tags conscripts
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param conscript body models.Conscript true "Conscript"
 // @Success 201 {object} models.Conscript
 // @Failure 400 {object} models.ErrorResponse
@@ -38,6 +39,7 @@ func CreateConscript(c *gin.Context) {
 // @Description Get a list of all conscripts
 // @Tags conscripts
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} models.Conscript
 // @Failure 500 {object} models.ErrorResponse
 // @Router /conscripts [get]
@@ -53,6 +55,7 @@ func GetConscripts(c *gin.Context) {
 // @Description Get a conscript by its ID
 // @Tags conscripts
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Conscript ID"
 // @Success 200 {object} models.Conscript
 // @Failure 404 {object} models.ErrorResponse
@@ -74,6 +77,7 @@ func GetConscript(c *gin.Context) {
 // @Tags conscripts
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Conscript ID"
 // @Param conscript body models.Conscript true "Conscript"
 // @Success 200 {object} models.Conscript
@@ -102,6 +106,7 @@ func UpdateConscript(c *gin.Context) {
 // @Description Delete a conscript by its ID
 // @Tags conscripts
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Conscript ID"
 // @Success 204 {string} string "No Content"
 // @Failure 404 {object} models.ErrorResponse

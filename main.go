@@ -16,39 +16,45 @@ func main() {
 
 	r := gin.Default()
 
+	// Authentication routes.
+	r.POST("/auth/login", handlers.Login)
+
+	// Protected CRUD routes.
+	auth := r.Group("", handlers.AuthMiddleware())
+
 	// Conscript CRUD routes.
-	r.POST("/conscripts", handlers.CreateConscript)
-	r.GET("/conscripts", handlers.GetConscripts)
-	r.GET("/conscripts/:id", handlers.GetConscript)
-	r.PUT("/conscripts/:id", handlers.UpdateConscript)
-	r.DELETE("/conscripts/:id", handlers.DeleteConscript)
+	auth.POST("/conscripts", handlers.CreateConscript)
+	auth.GET("/conscripts", handlers.GetConscripts)
+	auth.GET("/conscripts/:id", handlers.GetConscript)
+	auth.PUT("/conscripts/:id", handlers.UpdateConscript)
+	auth.DELETE("/conscripts/:id", handlers.DeleteConscript)
 
 	// Department CRUD routes.
-	r.POST("/departments", handlers.CreateDepartment)
-	r.GET("/departments", handlers.GetDepartments)
-	r.GET("/departments/:id", handlers.GetDepartment)
-	r.PUT("/departments/:id", handlers.UpdateDepartment)
-	r.DELETE("/departments/:id", handlers.DeleteDepartment)
+	auth.POST("/departments", handlers.CreateDepartment)
+	auth.GET("/departments", handlers.GetDepartments)
+	auth.GET("/departments/:id", handlers.GetDepartment)
+	auth.PUT("/departments/:id", handlers.UpdateDepartment)
+	auth.DELETE("/departments/:id", handlers.DeleteDepartment)
 
 	// Duty CRUD routes.
-	r.POST("/duties", handlers.CreateDuty)
-	r.GET("/duties", handlers.GetDuties)
-	r.GET("/duties/:id", handlers.GetDuty)
-	r.PUT("/duties/:id", handlers.UpdateDuty)
-	r.DELETE("/duties/:id", handlers.DeleteDuty)
+	auth.POST("/duties", handlers.CreateDuty)
+	auth.GET("/duties", handlers.GetDuties)
+	auth.GET("/duties/:id", handlers.GetDuty)
+	auth.PUT("/duties/:id", handlers.UpdateDuty)
+	auth.DELETE("/duties/:id", handlers.DeleteDuty)
 
 	// Service CRUD routes.
-	r.POST("/services", handlers.CreateService)
-	r.GET("/services", handlers.GetServices)
-	r.GET("/services/:id", handlers.GetService)
-	r.PUT("/services/:id", handlers.UpdateService)
-	r.DELETE("/services/:id", handlers.DeleteService)
+	auth.POST("/services", handlers.CreateService)
+	auth.GET("/services", handlers.GetServices)
+	auth.GET("/services/:id", handlers.GetService)
+	auth.PUT("/services/:id", handlers.UpdateService)
+	auth.DELETE("/services/:id", handlers.DeleteService)
 
 	// Conscript duties relationships CRUD routes.
-	r.POST("/conscript_duties", handlers.CreateConscriptDuty)
-	r.GET("/conscript_duties", handlers.GetConscriptDuties)
-	r.PUT("/conscript_duties", handlers.UpdateConscriptDuty)
-	r.DELETE("/conscript_duties", handlers.DeleteConscriptDuty)
+	auth.POST("/conscript_duties", handlers.CreateConscriptDuty)
+	auth.GET("/conscript_duties", handlers.GetConscriptDuties)
+	auth.PUT("/conscript_duties", handlers.UpdateConscriptDuty)
+	auth.DELETE("/conscript_duties", handlers.DeleteConscriptDuty)
 
 	// Auto-generated documentation endpoints.
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -15,6 +15,7 @@ import (
 // @Tags duties
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param duty body models.Duty true "Duty"
 // @Success 201 {object} models.Duty
 // @Failure 400 {object} models.ErrorResponse
@@ -38,6 +39,7 @@ func CreateDuty(c *gin.Context) {
 // @Description Get a list of all duties
 // @Tags duties
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} models.Duty
 // @Failure 500 {object} models.ErrorResponse
 // @Router /duties [get]
@@ -55,6 +57,7 @@ func GetDuties(c *gin.Context) {
 // @Description Get a duty by its ID
 // @Tags duties
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Duty ID"
 // @Success 200 {object} models.Duty
 // @Failure 400 {object} models.ErrorResponse
@@ -80,6 +83,7 @@ func GetDuty(c *gin.Context) {
 // @Tags duties
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Duty ID"
 // @Param duty body models.Duty true "Duty"
 // @Success 200 {object} models.Duty
@@ -115,6 +119,7 @@ func UpdateDuty(c *gin.Context) {
 // @Description Delete a duty by its ID
 // @Tags duties
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Duty ID"
 // @Success 200 {object} models.ErrorResponse
 // @Failure 400 {object} models.ErrorResponse

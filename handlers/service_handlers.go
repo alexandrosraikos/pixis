@@ -10,6 +10,17 @@ import (
 )
 
 // CreateService handles POST /services
+// @Summary Create a new service
+// @Description Create a new service in the system
+// @Tags services
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param service body models.Service true "Service"
+// @Success 201 {object} models.Service
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /services [post]
 func CreateService(c *gin.Context) {
 	var service models.Service
 	if err := c.ShouldBindJSON(&service); err != nil {
@@ -24,6 +35,14 @@ func CreateService(c *gin.Context) {
 }
 
 // GetServices handles GET /services
+// @Summary List all services
+// @Description Get a list of all services
+// @Tags services
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {array} models.Service
+// @Failure 500 {object} models.ErrorResponse
+// @Router /services [get]
 func GetServices(c *gin.Context) {
 	var services []models.Service
 	if err := database.GetDB().Find(&services).Error; err != nil {
@@ -34,6 +53,16 @@ func GetServices(c *gin.Context) {
 }
 
 // GetService handles GET /services/:id
+// @Summary Get a service by ID
+// @Description Get a service by its ID
+// @Tags services
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Service ID"
+// @Success 200 {object} models.Service
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /services/{id} [get]
 func GetService(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -49,6 +78,18 @@ func GetService(c *gin.Context) {
 }
 
 // UpdateService handles PUT /services/:id
+// @Summary Update a service
+// @Description Update a service by its ID
+// @Tags services
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Service ID"
+// @Param service body models.Service true "Service"
+// @Success 200 {object} models.Service
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /services/{id} [put]
 func UpdateService(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -74,6 +115,16 @@ func UpdateService(c *gin.Context) {
 }
 
 // DeleteService handles DELETE /services/:id
+// @Summary Delete a service
+// @Description Delete a service by its ID
+// @Tags services
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Service ID"
+// @Success 200 {object} models.ErrorResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /services/{id} [delete]
 func DeleteService(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

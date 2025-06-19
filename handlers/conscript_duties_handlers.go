@@ -15,6 +15,7 @@ import (
 // @Tags conscript_duties
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param conscript_duty body models.ConscriptDuty true "ConscriptDuty"
 // @Success 201 {object} models.ConscriptDuty
 // @Failure 400 {object} models.ErrorResponse
@@ -38,6 +39,7 @@ func CreateConscriptDuty(c *gin.Context) {
 // @Description List conscript-duty assignments by conscript_id or duty_id
 // @Tags conscript_duties
 // @Produce json
+// @Security BearerAuth
 // @Param conscript_id query int false "Conscript ID"
 // @Param duty_id query int false "Duty ID"
 // @Success 200 {array} models.ConscriptDuty
@@ -75,6 +77,7 @@ func GetConscriptDuties(c *gin.Context) {
 // @Tags conscript_duties
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param conscript_duty body models.ConscriptDuty true "ConscriptDuty"
 // @Success 200 {object} models.ConscriptDuty
 // @Failure 400 {object} models.ErrorResponse
@@ -111,6 +114,7 @@ func UpdateConscriptDuty(c *gin.Context) {
 // @Tags conscript_duties
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param conscript_duty body object true "ConscriptDuty IDs" {"conscript_id":0,"duty_id":0}
 // @Success 204 {string} string "No Content"
 // @Failure 400 {object} models.ErrorResponse

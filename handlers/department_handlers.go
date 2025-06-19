@@ -15,6 +15,7 @@ import (
 // @Tags departments
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param department body models.Department true "Department"
 // @Success 201 {object} models.Department
 // @Failure 400 {object} models.ErrorResponse
@@ -38,6 +39,7 @@ func CreateDepartment(c *gin.Context) {
 // @Description Get a list of all departments
 // @Tags departments
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {array} models.Department
 // @Failure 500 {object} models.ErrorResponse
 // @Router /departments [get]
@@ -55,6 +57,7 @@ func GetDepartments(c *gin.Context) {
 // @Description Get a department by its ID
 // @Tags departments
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Department ID"
 // @Success 200 {object} models.Department
 // @Failure 400 {object} models.ErrorResponse
@@ -80,6 +83,7 @@ func GetDepartment(c *gin.Context) {
 // @Tags departments
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Department ID"
 // @Param department body models.Department true "Department"
 // @Success 200 {object} models.Department
@@ -115,6 +119,7 @@ func UpdateDepartment(c *gin.Context) {
 // @Description Delete a department by its ID
 // @Tags departments
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Department ID"
 // @Success 200 {object} models.ErrorResponse
 // @Failure 400 {object} models.ErrorResponse

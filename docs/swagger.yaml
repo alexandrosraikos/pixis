@@ -1,5 +1,26 @@
 definitions:
+  handlers.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handlers.LoginResponse:
+    properties:
+      conscript:
+        $ref: '#/definitions/models.Conscript'
+      token:
+        type: string
+    type: object
   models.Conscript:
+    description: Conscript is a user entity used for authentication and as a foreign
+      key in other models. It includes unique registry and username fields, a password
+      (should be hashed in production), and belongs to a department. Timestamps are
+      managed by Gorm.
     properties:
       createdAt:
         type: string
@@ -23,6 +44,8 @@ definitions:
         type: string
     type: object
   models.ConscriptDuty:
+    description: 'ConscriptDuty is the join table for conscripts and duties, with
+      assignment period and timestamps. Composite primary key: conscript_id, duty_id.'
     properties:
       conscriptID:
         type: integer
@@ -38,6 +61,9 @@ definitions:
         type: string
     type: object
   models.Department:
+    description: Department is a unique grouping for conscripts and services. It is
+      referenced by conscripts and services, and includes a unique label. Timestamps
+      are managed by Gorm.
     properties:
       conscripts:
         items:
@@ -57,6 +83,9 @@ definitions:
         type: string
     type: object
   models.Duty:
+    description: Duty is a task or responsibility assigned to conscripts, linked to
+      a service, and can be assigned to many conscripts. Timestamps are managed by
+      Gorm.
     properties:
       conscriptDuties:
         items:
@@ -81,6 +110,8 @@ definitions:
         type: string
     type: object
   models.Service:
+    description: Service is a grouping of duties within a department. Label is unique.
+      Timestamps are managed by Gorm.
     properties:
       createdAt:
         type: string
@@ -102,6 +133,36 @@ definitions:
 info:
   contact: {}
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a conscript and get a JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login as a conscript
+      tags:
+      - auth
   /conscript_duties:
     delete:
       consumes:
@@ -129,6 +190,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Remove a duty from a conscript
       tags:
       - conscript_duties
@@ -156,6 +219,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: List conscript-duty assignments
       tags:
       - conscript_duties
@@ -185,6 +250,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Assign a duty to a conscript
       tags:
       - conscript_duties
@@ -214,6 +281,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a conscript-duty assignment
       tags:
       - conscript_duties
@@ -233,6 +302,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: List all conscripts
       tags:
       - conscripts
@@ -262,6 +333,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new conscript
       tags:
       - conscripts
@@ -285,6 +358,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a conscript
       tags:
       - conscripts
@@ -307,6 +382,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a conscript by ID
       tags:
       - conscripts
@@ -341,6 +418,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a conscript
       tags:
       - conscripts
@@ -360,6 +439,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: List all departments
       tags:
       - departments
@@ -389,6 +470,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new department
       tags:
       - departments
@@ -416,6 +499,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a department
       tags:
       - departments
@@ -442,6 +527,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a department by ID
       tags:
       - departments
@@ -476,6 +563,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a department
       tags:
       - departments
@@ -495,6 +584,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: List all duties
       tags:
       - duties
@@ -524,6 +615,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new duty
       tags:
       - duties
@@ -551,6 +644,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a duty
       tags:
       - duties
@@ -577,6 +672,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get a duty by ID
       tags:
       - duties
@@ -611,7 +708,154 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a duty
       tags:
       - duties
+  /services:
+    get:
+      description: Get a list of all services
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Service'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List all services
+      tags:
+      - services
+    post:
+      consumes:
+      - application/json
+      description: Create a new service in the system
+      parameters:
+      - description: Service
+        in: body
+        name: service
+        required: true
+        schema:
+          $ref: '#/definitions/models.Service'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Service'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new service
+      tags:
+      - services
+  /services/{id}:
+    delete:
+      description: Delete a service by its ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a service
+      tags:
+      - services
+    get:
+      description: Get a service by its ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Service'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get a service by ID
+      tags:
+      - services
+    put:
+      consumes:
+      - application/json
+      description: Update a service by its ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Service
+        in: body
+        name: service
+        required: true
+        schema:
+          $ref: '#/definitions/models.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Service'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a service
+      tags:
+      - services
 swagger: "2.0"
