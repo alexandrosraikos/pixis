@@ -13,7 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// MockConscript is a reusable mock for tests
 var MockConscript = models.Conscript{
 	FirstName:      "TestFirst",
 	LastName:       "TestLast",
@@ -24,7 +23,7 @@ var MockConscript = models.Conscript{
 
 func setupRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
-	database.ConnectDatabase("conscript_test.db")
+	database.RecreateDatabase("conscript_test.db")
 	r := gin.Default()
 	r.POST("/conscripts", CreateConscript)
 	r.GET("/conscripts", GetConscripts)
@@ -34,18 +33,28 @@ func setupRouter() *gin.Engine {
 	return r
 }
 
-func beforeEach(t *testing.T) *gin.Engine {
-	// Optionally, clean up the DB file here if you want a fresh DB for each test
+func beforeEach(t *testing.T) (*gin.Engine, uint) {
 	r := setupRouter()
+	// Create a department for foreign key
+	db := database.GetDB()
+	dept := MockDepartment
+
+	// Ensure department with same label does not exist
+	db.Where("label = ?", dept.Label).Delete(&models.Department{})
+
+	if err := db.Create(&dept).Error; err != nil {
+		t.Fatalf("failed to create department: %v", err)
+	}
 	t.Cleanup(func() {
 		// Add DB cleanup code here if needed
 	})
-	return r
+	return r, dept.ID
 }
 
 func TestCreateConscript(t *testing.T) {
-	r := beforeEach(t)
+	r, deptID := beforeEach(t)
 	conscript := MockConscript
+	conscript.DepartmentID = deptID
 	jsonValue, _ := json.Marshal(conscript)
 	req, _ := http.NewRequest("POST", "/conscripts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
@@ -54,20 +63,28 @@ func TestCreateConscript(t *testing.T) {
 	if w.Code != http.StatusCreated {
 		t.Errorf("expected status %d, got %d", http.StatusCreated, w.Code)
 	}
+	var created models.Conscript
+	json.Unmarshal(w.Body.Bytes(), &created)
+	if created.DepartmentID != deptID {
+		t.Errorf("expected DepartmentID %d, got %d", deptID, created.DepartmentID)
+	}
+	if created.CreatedAt.IsZero() || created.UpdatedAt.IsZero() {
+		t.Errorf("expected CreatedAt and UpdatedAt to be set")
+	}
 }
 
 func TestGetConscripts(t *testing.T) {
-	r := beforeEach(t)
+	r, deptID := beforeEach(t)
 	conscript := MockConscript
 	conscript.RegistryNumber = "54321"
 	conscript.Username = "janesmith"
+	conscript.DepartmentID = deptID
 	jsonValue, _ := json.Marshal(conscript)
 	req, _ := http.NewRequest("POST", "/conscripts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	// Now test GET /conscripts
 	req, _ = http.NewRequest("GET", "/conscripts", nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
@@ -82,13 +99,19 @@ func TestGetConscripts(t *testing.T) {
 	if len(conscripts) == 0 {
 		t.Errorf("expected at least one conscript, got 0")
 	}
+	for _, c := range conscripts {
+		if c.DepartmentID != deptID {
+			t.Errorf("expected DepartmentID %d, got %d", deptID, c.DepartmentID)
+		}
+	}
 }
 
 func TestGetConscript(t *testing.T) {
-	r := beforeEach(t)
+	r, deptID := beforeEach(t)
 	conscript := MockConscript
 	conscript.RegistryNumber = "11111"
 	conscript.Username = "alice"
+	conscript.DepartmentID = deptID
 	jsonValue, _ := json.Marshal(conscript)
 	req, _ := http.NewRequest("POST", "/conscripts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
@@ -97,8 +120,7 @@ func TestGetConscript(t *testing.T) {
 	var created models.Conscript
 	json.Unmarshal(w.Body.Bytes(), &created)
 
-	// Now test GET /conscripts/:id
-	url := "/conscripts/" + json.Number(fmt.Sprintf("%d", created.ID)).String()
+	url := fmt.Sprintf("/conscripts/%d", created.ID)
 	req, _ = http.NewRequest("GET", url, nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)
@@ -113,13 +135,17 @@ func TestGetConscript(t *testing.T) {
 	if got.ID != created.ID {
 		t.Errorf("expected ID %d, got %d", created.ID, got.ID)
 	}
+	if got.DepartmentID != deptID {
+		t.Errorf("expected DepartmentID %d, got %d", deptID, got.DepartmentID)
+	}
 }
 
 func TestUpdateConscript(t *testing.T) {
-	r := beforeEach(t)
+	r, deptID := beforeEach(t)
 	conscript := MockConscript
 	conscript.RegistryNumber = "22222"
 	conscript.Username = "bob"
+	conscript.DepartmentID = deptID
 	jsonValue, _ := json.Marshal(conscript)
 	req, _ := http.NewRequest("POST", "/conscripts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
@@ -128,10 +154,9 @@ func TestUpdateConscript(t *testing.T) {
 	var created models.Conscript
 	json.Unmarshal(w.Body.Bytes(), &created)
 
-	// Now test PUT /conscripts/:id
-	update := models.Conscript{FirstName: "Robert"}
+	update := models.Conscript{FirstName: "Robert", DepartmentID: deptID}
 	jsonValue, _ = json.Marshal(update)
-	url := "/conscripts/" + json.Number(fmt.Sprintf("%d", created.ID)).String()
+	url := fmt.Sprintf("/conscripts/%d", created.ID)
 	req, _ = http.NewRequest("PUT", url, bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
 	w = httptest.NewRecorder()
@@ -144,13 +169,17 @@ func TestUpdateConscript(t *testing.T) {
 	if updated.FirstName != "Robert" {
 		t.Errorf("expected FirstName 'Robert', got '%s'", updated.FirstName)
 	}
+	if updated.DepartmentID != deptID {
+		t.Errorf("expected DepartmentID %d, got %d", deptID, updated.DepartmentID)
+	}
 }
 
 func TestDeleteConscript(t *testing.T) {
-	r := beforeEach(t)
+	r, deptID := beforeEach(t)
 	conscript := MockConscript
 	conscript.RegistryNumber = "33333"
 	conscript.Username = "carl"
+	conscript.DepartmentID = deptID
 	jsonValue, _ := json.Marshal(conscript)
 	req, _ := http.NewRequest("POST", "/conscripts", bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
@@ -159,8 +188,7 @@ func TestDeleteConscript(t *testing.T) {
 	var created models.Conscript
 	json.Unmarshal(w.Body.Bytes(), &created)
 
-	// Now test DELETE /conscripts/:id
-	url := "/conscripts/" + json.Number(fmt.Sprintf("%d", created.ID)).String()
+	url := fmt.Sprintf("/conscripts/%d", created.ID)
 	req, _ = http.NewRequest("DELETE", url, nil)
 	w = httptest.NewRecorder()
 	r.ServeHTTP(w, req)

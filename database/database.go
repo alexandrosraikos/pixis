@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"os"
 
 	"github.com/alexandrosraikos/pixis/models"
 	"gorm.io/driver/sqlite"
@@ -18,13 +19,19 @@ func ConnectDatabase(path string) {
 
 	// Auto-migrate the Conscript model
 	db.AutoMigrate(
-		&models.ConscriptDuty{},
 		&models.Department{},
-		&models.Conscript{},
 		&models.Service{},
+		&models.Conscript{},
 		&models.Duty{},
+		&models.ConscriptDuty{},
 	)
 	DB = db
+}
+
+// RecreateDatabase deletes the DB file (if exists) and creates a fresh one
+func RecreateDatabase(path string) {
+	_ = os.Remove(path) // ignore error if file does not exist
+	ConnectDatabase(path)
 }
 
 func GetDB() *gorm.DB {
