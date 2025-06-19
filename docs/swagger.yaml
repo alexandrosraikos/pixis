@@ -1,0 +1,617 @@
+definitions:
+  models.Conscript:
+    properties:
+      createdAt:
+        type: string
+      department:
+        $ref: '#/definitions/models.Department'
+      departmentID:
+        type: integer
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      password:
+        type: string
+      registryNumber:
+        type: string
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+  models.ConscriptDuty:
+    properties:
+      conscriptID:
+        type: integer
+      createdAt:
+        type: string
+      dutyID:
+        type: integer
+      endTime:
+        type: string
+      startTime:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  models.Department:
+    properties:
+      conscripts:
+        items:
+          $ref: '#/definitions/models.Conscript'
+        type: array
+      createdAt:
+        type: string
+      id:
+        type: integer
+      label:
+        type: string
+      services:
+        items:
+          $ref: '#/definitions/models.Service'
+        type: array
+      updatedAt:
+        type: string
+    type: object
+  models.Duty:
+    properties:
+      conscriptDuties:
+        items:
+          $ref: '#/definitions/models.ConscriptDuty'
+        type: array
+      createdAt:
+        type: string
+      id:
+        type: integer
+      label:
+        type: string
+      service:
+        $ref: '#/definitions/models.Service'
+      serviceID:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Service:
+    properties:
+      createdAt:
+        type: string
+      department:
+        $ref: '#/definitions/models.Department'
+      departmentID:
+        type: integer
+      duties:
+        items:
+          $ref: '#/definitions/models.Duty'
+        type: array
+      id:
+        type: integer
+      label:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /conscript_duties:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a duty from a conscript by conscript_id and duty_id
+      parameters:
+      - description: ConscriptDuty IDs
+        in: body
+        name: conscript_duty
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Remove a duty from a conscript
+      tags:
+      - conscript_duties
+    get:
+      description: List conscript-duty assignments by conscript_id or duty_id
+      parameters:
+      - description: Conscript ID
+        in: query
+        name: conscript_id
+        type: integer
+      - description: Duty ID
+        in: query
+        name: duty_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ConscriptDuty'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List conscript-duty assignments
+      tags:
+      - conscript_duties
+    post:
+      consumes:
+      - application/json
+      description: Assign a duty to a conscript with start and end time
+      parameters:
+      - description: ConscriptDuty
+        in: body
+        name: conscript_duty
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConscriptDuty'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ConscriptDuty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Assign a duty to a conscript
+      tags:
+      - conscript_duties
+    put:
+      consumes:
+      - application/json
+      description: Update start and end time for a conscript-duty assignment
+      parameters:
+      - description: ConscriptDuty
+        in: body
+        name: conscript_duty
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConscriptDuty'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConscriptDuty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update a conscript-duty assignment
+      tags:
+      - conscript_duties
+  /conscripts:
+    get:
+      description: Get a list of all conscripts
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Conscript'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List all conscripts
+      tags:
+      - conscripts
+    post:
+      consumes:
+      - application/json
+      description: Create a new conscript in the system
+      parameters:
+      - description: Conscript
+        in: body
+        name: conscript
+        required: true
+        schema:
+          $ref: '#/definitions/models.Conscript'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Conscript'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new conscript
+      tags:
+      - conscripts
+  /conscripts/{id}:
+    delete:
+      description: Delete a conscript by its ID
+      parameters:
+      - description: Conscript ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete a conscript
+      tags:
+      - conscripts
+    get:
+      description: Get a conscript by its ID
+      parameters:
+      - description: Conscript ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Conscript'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a conscript by ID
+      tags:
+      - conscripts
+    put:
+      consumes:
+      - application/json
+      description: Update a conscript by its ID
+      parameters:
+      - description: Conscript ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Conscript
+        in: body
+        name: conscript
+        required: true
+        schema:
+          $ref: '#/definitions/models.Conscript'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Conscript'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update a conscript
+      tags:
+      - conscripts
+  /departments:
+    get:
+      description: Get a list of all departments
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Department'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List all departments
+      tags:
+      - departments
+    post:
+      consumes:
+      - application/json
+      description: Create a new department in the system
+      parameters:
+      - description: Department
+        in: body
+        name: department
+        required: true
+        schema:
+          $ref: '#/definitions/models.Department'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Department'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new department
+      tags:
+      - departments
+  /departments/{id}:
+    delete:
+      description: Delete a department by its ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete a department
+      tags:
+      - departments
+    get:
+      description: Get a department by its ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Department'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a department by ID
+      tags:
+      - departments
+    put:
+      consumes:
+      - application/json
+      description: Update a department by its ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Department
+        in: body
+        name: department
+        required: true
+        schema:
+          $ref: '#/definitions/models.Department'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Department'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update a department
+      tags:
+      - departments
+  /duties:
+    get:
+      description: Get a list of all duties
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Duty'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: List all duties
+      tags:
+      - duties
+    post:
+      consumes:
+      - application/json
+      description: Create a new duty in the system
+      parameters:
+      - description: Duty
+        in: body
+        name: duty
+        required: true
+        schema:
+          $ref: '#/definitions/models.Duty'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Duty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a new duty
+      tags:
+      - duties
+  /duties/{id}:
+    delete:
+      description: Delete a duty by its ID
+      parameters:
+      - description: Duty ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete a duty
+      tags:
+      - duties
+    get:
+      description: Get a duty by its ID
+      parameters:
+      - description: Duty ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Duty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a duty by ID
+      tags:
+      - duties
+    put:
+      consumes:
+      - application/json
+      description: Update a duty by its ID
+      parameters:
+      - description: Duty ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Duty
+        in: body
+        name: duty
+        required: true
+        schema:
+          $ref: '#/definitions/models.Duty'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Duty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update a duty
+      tags:
+      - duties
+swagger: "2.0"

@@ -13,11 +13,11 @@ import (
 func CreateService(c *gin.Context) {
 	var service models.Service
 	if err := c.ShouldBindJSON(&service); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 		return
 	}
 	if err := database.GetDB().Create(&service).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, service)
@@ -27,7 +27,7 @@ func CreateService(c *gin.Context) {
 func GetServices(c *gin.Context) {
 	var services []models.Service
 	if err := database.GetDB().Find(&services).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, services)
@@ -37,12 +37,12 @@ func GetServices(c *gin.Context) {
 func GetService(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid service ID"})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: "Invalid service ID"})
 		return
 	}
 	var service models.Service
 	if err := database.GetDB().First(&service, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Service not found"})
+		c.JSON(http.StatusNotFound, models.ErrorResponse{Error: "Service not found"})
 		return
 	}
 	c.JSON(http.StatusOK, service)
@@ -52,22 +52,22 @@ func GetService(c *gin.Context) {
 func UpdateService(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid service ID"})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: "Invalid service ID"})
 		return
 	}
 	var service models.Service
 	db := database.GetDB()
 	if err := db.First(&service, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Service not found"})
+		c.JSON(http.StatusNotFound, models.ErrorResponse{Error: "Service not found"})
 		return
 	}
 	if err := c.ShouldBindJSON(&service); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 		return
 	}
 	service.ID = uint(id)
 	if err := db.Save(&service).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, service)
@@ -77,18 +77,18 @@ func UpdateService(c *gin.Context) {
 func DeleteService(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid service ID"})
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: "Invalid service ID"})
 		return
 	}
 	var service models.Service
 	db := database.GetDB()
 	if err := db.First(&service, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Service not found"})
+		c.JSON(http.StatusNotFound, models.ErrorResponse{Error: "Service not found"})
 		return
 	}
 	if err := db.Delete(&service).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Service deleted"})
+	c.JSON(http.StatusOK, models.ErrorResponse{Error: "Service deleted"})
 }
